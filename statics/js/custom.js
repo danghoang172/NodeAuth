@@ -17,7 +17,18 @@ var baseURL = "http://localhost:8080/";
 		$http.get(baseURL + "userinfo").then(function(response) {
         user = response.data;
 		$scope.isMature =$scope.checkAge(user.ageRange.min);
-      });
+      })
+	  .then(function() {
+		$http({
+		  method: 'POST',
+		  url: baseURL +'login',
+		  data: {strategy: "google", ageMin: user.ageRange.min}
+		}).then(function successCallback(response) {
+			window.location.href = '/test';
+		  }, function errorCallback(response) {
+
+		  });
+      });  	
 	  	
       };
 	  

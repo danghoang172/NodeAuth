@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    title Oauth demo
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js')
+    script(src='js/custom.js')
+    link(href='stylesheets/main.css', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+  body(ng-app='app', ng-controller='ctrl')
+    .container
+        .row.pad-top.text-center
+          .col-lg-12.col-md-12.col-sm-12.col-xs-12
+            h1
+              strong  Congratulation 
+              |  You are at least 18
+            h3 Here is a cute cat picture for you:
+            img(src='pictures/cute-cat.jpg', alt='Cute Cat', style='width:1280px;height:720px;')
+            a.btn.btn-default.btn-lg(href='#')
+              strong  BACK TO HOME 
+h1!=message

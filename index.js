@@ -2,44 +2,50 @@
 Module Dependencies 
 */
 var google = require("googleapis");
-var app = express();
 var plus = google.plus({
   version: 'v1',
   auth: oauth2Client
 });
-var express = require('express'),
-    path = require('path'),
-    mongoose = require('mongoose'),
-    hash = require('./pass').hash;
-
+var express = require('express');
+var path = require('path');
+var mongoose = require('mongoose');
+var hash = require('./pass').hash;
 var OAuth2 = google.auth.OAuth2;
-
+var app = express();
+var session = require('express-session');
+var multer = require('multer');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 var oauth2Client = new OAuth2("1033019170702-rve7g8nh21ekfkbcpk47113jf0td7enb.apps.googleusercontent.com", 
 								"F_JnQG1fbbQ5bRxbuHd3p6E4", 
 								"http://xamloz.com/projects/oauth_app/oauthcallback"
 );
 
-// generate a url that asks permissions for Google+ and Google Calendar scopes
+// generate a url that asks permissions for Google+ scopes
 var scopes = [
   'https://www.googleapis.com/auth/plus.login'
 ];
+
+var UserSchema = new mongoose.Schema({
+    username: String,
+    password: String,
+	birthDate: Date,
+    salt: String,
+    hash: String
+});
 
 var url = oauth2Client.generateAuthUrl({
   access_type: 'offline', // 'online' (default) or 'offline' (gets refresh_token)
   scope: scopes // If you only need one scope you can pass it as string
 });
-var User = mongoose.model('users', UserSchema);
+var User = mongoose.model('usrs', UserSchema);
 var API_KEY = "AIzaSyAi9mcGJI1ef6A9j4Bn601f041ewxV4p6k";
+var ageMin;
+var ggUser;
 /*
 Database and Models
 */
-mongoose.connect("mongodb://hoang:Hoangnguyen95@ds151222.mlab.com:51222/oauth_app");
-var UserSchema = new mongoose.Schema({
-    username: String,
-    password: String,
-    salt: String,
-    hash: String
-});
+mongoose.connect("mongodb://gwyn:Hoangnguyen95@ds151242.mlab.com:51242/oauth_app");
 
 /*
 Middlewares and configurations 
@@ -52,15 +58,17 @@ var server = app.listen(8080, function() {
   console.log('Example app listening at http://%s:%s', host, port);
 });
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+// parse multipart/form-data
+app.use(multer());
+app.use(express.static(path.join(__dirname, 'public'))); 
+app.use(cookieParser())
+app.use(session({ resave: true, saveUninitialized: true, secret: 'uwotm8' }));
+app.use(express.static(path.join(__dirname, 'statics')));
+app.set('views', __dirname + '/views');
+app.set('view engine', 'pug');
 
-app.configure(function () {
-    app.use(express.bodyParser());
-    app.use(express.cookieParser('Authentication App '));
-    app.use(express.session());
-    app.use(express.static(path.join(__dirname, 'statics')));
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-});
 
 app.use(function (req, res, next) {
     var err = req.session.error,
@@ -70,22 +78,6 @@ app.use(function (req, res, next) {
     res.locals.message = '';
     if (err) res.locals.message = '<p class="msg error">' + err + '</p>';
     if (msg) res.locals.message = '<p class="msg success">' + msg + '</p>';
-    next();
-});
-
-
-// Add headers to allow CORS
-app.use(function (req, res, next) {
-
-    // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
     next();
 });
 
@@ -149,13 +141,28 @@ function userExist(req, res, next) {
     });
 }
 
+function checkAge(age) {	
+		if(age >= 18){
+			return true;
+		}
+		else{
+			return false;
+		}
+};
+
+function calculateAge(birthday) { // birthday is a date
+    var ageDifMs = Date.now() - birthday.getTime();
+    var ageDate = new Date(ageDifMs); // miliseconds from epoch
+    return Math.abs(ageDate.getUTCFullYear() - 1970);
+}
+
 /*
 Routes
 */
 app.get("/", function (req, res) {
-
     if (req.session.user) {
-        res.send("Welcome " + req.session.user.username + "<br>" + "<a href='/logout'>logout</a>");
+		res.render("main");
+
     } else {
         res.render("main");
     }
@@ -163,7 +170,7 @@ app.get("/", function (req, res) {
 
 app.get("/signup", function (req, res) {
     if (req.session.user) {
-        res.redirect("/");
+        res.redirect('/profile');
     } else {
         res.render("signup");
     }
@@ -172,47 +179,72 @@ app.get("/signup", function (req, res) {
 app.post("/signup", userExist, function (req, res) {
     var password = req.body.password;
     var username = req.body.username;
+	var birthDate = req.body.birthDate;
 
     hash(password, function (err, salt, hash) {
-        if (err) throw err;
-        var user = new User({
+        if (err){
+			throw err;			
+		} 
+		else{
+			var user = new User({
             username: username,
+			birthDate: birthDate,
             salt: salt,
             hash: hash,
-        }).save(function (err, newUser) {
-            if (err) throw err;
-            authenticate(newUser.username, password, function(err, user){
-                if(user){
-                    req.session.regenerate(function(){
-                        req.session.user = user;
-                        req.session.success = 'Authenticated as ' + user.username + ' click to <a href="/logout">logout</a>. ' + ' You may now access <a href="/restricted">/restricted</a>.';
-                        res.redirect('/');
-                    });
-                }
-            });
-        });
+			}).save(function (err, newUser) {
+				if (err) throw err;
+				else{
+					authenticate(newUser.username, password, function(err, user){
+					if(user){
+						req.session.regenerate(function(){
+							req.session.user = user;
+							req.session.success = 'Authenticated as ' + user.username + ' click to <a href="/logout">logout</a>. ' + ' You may now access <a href="/restricted">/restricted</a>.';
+							res.redirect('/');
+						});
+					}
+				});
+
+				}
+				
+			});
+			
+		}
+        
     });
 });
 
 app.get("/login", function (req, res) {
-    res.render("login");
+    res.render("main");
 });
 
 app.post("/login", function (req, res) {
-    authenticate(req.body.username, req.body.password, function (err, user) {
+	if(req.body.username){
+		authenticate(req.body.username, req.body.password, function (err, user) {
         if (user) {
 
             req.session.regenerate(function () {
 
                 req.session.user = user;
-                req.session.success = 'Authenticated as ' + user.username + ' click to <a href="/logout">logout</a>. ' + ' You may now access <a href="/restricted">/restricted</a>.';
-                res.redirect('/');
+				req.session.userAge = calculateAge(user.birthDate);
+				console.log(req.session.userAge);
+                res.redirect('/profile');
             });
         } else {
             req.session.error = 'Authentication failed, please check your ' + ' username and password.';
             res.redirect('/login');
         }
     });
+	}
+	
+	//using oauth
+	else{
+		if(req.body.strategy){
+			ageMin = req.body.ageMin;
+			res.redirect('/test');
+		}
+	}
+		
+    
 });
 
 app.get('/logout', function (req, res) {
@@ -221,8 +253,22 @@ app.get('/logout', function (req, res) {
     });
 });
 
+app.get('/test', function (req, res) {
+	if (checkAge(ageMin)) {
+        res.render("profile");
+    } else {
+		res.render("505");
+    }
+});
+
+
 app.get('/profile', requiredAuthentication, function (req, res) {
-    res.send('Profile page of '+ req.session.user.username +'<br>'+' click to <a href="/logout">logout</a>');
+	if (checkAge(req.session.userAge)) {
+        res.render("profile");
+    } else {
+		res.render("505");
+    }
+	
 });
 
 app.get("/userinfo", function(req, res) {
@@ -241,13 +287,6 @@ app.get("/userinfo", function(req, res) {
 		console.log(response);
 		res.send(response);
 	});
-});
-
-var server = app.listen(8080, function() {
-  var host = server.address().address;
-  var port = server.address().port;
-
-  console.log('Example app listening at http://%s:%s', host, port);
 });
 
 app.get("/url", function(req, res) {

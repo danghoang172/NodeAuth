@@ -1,0 +1,37 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    title Oauth demo
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js')
+    script(src='js/custom.js')
+    link(href='stylesheets/main.css', rel='stylesheet', type='text/css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+  body(ng-app='app', ng-controller='ctrl')
+    .container
+      form#signup.form-horizontal(role='form', method='POST', action='/signup')
+        h2 Registration Form
+        .form-group
+          label.col-sm-3.control-label(for='firstName') Username
+          .col-sm-9
+            input#username.form-control(type='text', name='username', autofocus='')
+            span.help-block Any nickname you want
+        .form-group
+          label.col-sm-3.control-label(for='password') Password
+          .col-sm-9
+            input#password.form-control(type='password', name='password')
+        .form-group
+          label.col-sm-3.control-label(for='birthDate') Date of Birth
+          .col-sm-9
+            input#birthDate.form-control(type='date', name='birthDate')
+        .form-group
+          .col-sm-9.col-sm-offset-3
+            .checkbox
+              label
+                input(type='checkbox')
+                | I accept 
+                a(href='#') terms
+        .form-group
+          .col-sm-9.col-sm-offset-3
+            button.btn.btn-primary.btn-block(type='submit', value='Sign UP') Register
