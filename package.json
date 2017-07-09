@@ -1,0 +1,27 @@
+{
+  "name": "node-js-Oauth",
+  "version": "1.0.0",
+  "description": "A sample Node.js OAuth using Express 4",
+  "engines": {
+    "node": "6.10.2"
+  },
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "ejs": "2.5.6",
+    "express": "4.15.2",
+    "googleapis": "^20.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "keywords": [
+    "node",
+    "express",
+    "oauth"
+  ],
+  "license": "MIT"
+}

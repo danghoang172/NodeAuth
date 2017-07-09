@@ -1,0 +1,55 @@
+doctype html
+html
+  head
+    meta(charset='UTF-8')
+    title Oauth demo
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js')
+    script(src='https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js')
+    script(src='js/custom.js')
+    link(href='stylesheets/main.css', rel='stylesheet', type='text/css')
+    // Latest compiled and minified CSS
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+  body(ng-app='app', ng-controller='ctrl')
+    div(ng-show='myValue')
+      .container
+        .row
+          .col-md-4.col-md-offset-4
+            .account-box
+              .logo
+                img(src='http://design.ubuntu.com/wp-content/uploads/ubuntu-logo32.png', width='80px', alt='')
+              form.form-signin(action='#')
+                .form-group
+                  input.form-control(type='text', placeholder='Email', required='', autofocus='')
+                .form-group
+                  input.form-control(type='password', placeholder='Password', required='')
+                button.btn.btn-lg.btn-block.btn-primary(type='submit')
+                  | Sign in
+              a.forgotLnk(href='#') I can't access my account
+              .or-box
+                .row
+                  .col-md-12.row-block
+                    a.btn.btn-lg.btn-danger.btn-block(href='', ng-click='auth()')
+                      strong Login With Google
+              .or-box.row-block
+                .row
+                  .col-md-12.row-block
+                    a.btn.btn-primary.btn-block(href='#') Create New Account
+    div(ng-show='!myValue')
+      div(ng-show='isMature')
+        .container
+          .row.pad-top.text-center
+            .col-lg-12.col-md-12.col-sm-12.col-xs-12
+              h1
+                strong  Congratulation!! 
+              h3 You are older than 18! Here's a cute cat for you. Enjoy:
+              img(src='pictures/cute-cat.jpg', alt='Cute Cat', style='width:1080px;height:720px;')
+      div(ng-show='!isMature')
+        .container
+          .row.pad-top.text-center
+            .col-lg-12.col-md-12.col-sm-12.col-xs-12
+              h1
+                strong  Oops! 
+                |  ERROR
+              h3 You are not old enough to access this page
+              a.btn.btn-default.btn-lg(href='#')
+                strong  BACK TO HOME 
