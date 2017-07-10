@@ -18,7 +18,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var oauth2Client = new OAuth2("1033019170702-rve7g8nh21ekfkbcpk47113jf0td7enb.apps.googleusercontent.com", 
 								"F_JnQG1fbbQ5bRxbuHd3p6E4", 
-								"http://xamloz.com/projects/oauth_app/oauthcallback"
+								"http://xamloz.com/projects/menu/back_end_projects/oauth_app/oauthcallback"
 );
 
 // generate a url that asks permissions for Google+ scopes
