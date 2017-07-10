@@ -9,7 +9,7 @@ var baseURL = "https://localhost:8080/";
 	  $scope.myValue = true;
 	  $scope.isMature;
 	  
-      $http.get("/url").then(function(response) {
+      $http.get("/url").then(function(response) {		  
         url = response.data;
       });
 	  	  
@@ -50,7 +50,7 @@ var baseURL = "https://localhost:8080/";
         var urlWithCode = e.data;
         var idx = urlWithCode.lastIndexOf("code=");
         var code = urlWithCode.substring(idx + 5).replace("#","");
-        $http.get(baseURL + "tokens?code=" + code).then(function(response) {
+        $http.get("/tokens?code=" + code).then(function(response) {
 		  $scope.myValue = false;
 		  $scope.getUserInfo();
 		  
