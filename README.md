@@ -1,13 +1,13 @@
 # NodeAuth
 
-A barebones Node.js app using [Express 4](http://expressjs.com/).
+Google Oauth and local authencitation using Node.js app using [Express 4](http://expressjs.com/).
 
 ## Running Locally
 
 Make sure you have [Node.js](http://nodejs.org/) installed.
 
 ```sh
-$ git clone git@github.com:heroku/node-js-getting-started.git # or clone your own fork
+$ git clone https://github.com/danghoang172/NodeAuth
 $ cd node-js-getting-started
 $ npm install
 $ npm start
