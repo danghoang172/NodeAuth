@@ -1,5 +1,5 @@
 var app = angular.module("app", []);
-var baseURL = "http://localhost:8080/";
+var baseURL = "https://localhost:8080/";
 
     app.controller("ctrl", function($scope, $http, $window) {
 
@@ -9,19 +9,19 @@ var baseURL = "http://localhost:8080/";
 	  $scope.myValue = true;
 	  $scope.isMature;
 	  
-      $http.get(baseURL + "url").then(function(response) {
+      $http.get("/url").then(function(response) {
         url = response.data;
       });
 	  	  
 	  $scope.getUserInfo = function() {	
-		$http.get(baseURL + "userinfo").then(function(response) {
+		$http.get("/userinfo").then(function(response) {
         user = response.data;
 		$scope.isMature =$scope.checkAge(user.ageRange.min);
       })
 	  .then(function() {
 		$http({
 		  method: 'POST',
-		  url: baseURL +'login',
+		  url: '/login',
 		  data: {strategy: "google", ageMin: user.ageRange.min}
 		}).then(function successCallback(response) {
 			window.location.href = '/test';
