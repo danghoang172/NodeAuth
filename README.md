@@ -1,7 +1,7 @@
 # NodeAuth
 
 Google Oauth and local authencitation using Node.js app using [Express 4](http://expressjs.com/).
-This app simply asks you to access your age range to determine if you are old enough to watch an video. Don't worry it's totally safe for work.
+This app simply asks you to access your age range to determine if you are old enough to see a picture. Don't worry it's totally safe for work.
 
 ## Online Demo
 
